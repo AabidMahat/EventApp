@@ -18,7 +18,7 @@ const eventSchema = new mongoose.Schema({
     type: String,
   },
   ticketprice: {
-    type: String,
+    type: Number,
   },
   dateandtime: {
     type: String,

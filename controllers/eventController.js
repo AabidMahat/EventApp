@@ -31,7 +31,6 @@ exports.getAllEvent = async (req, res, next) => {
       message: "Not able to create events",
     });
   }
-
   res.status(200).json({
     status: "success",
     length: events.length,

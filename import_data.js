@@ -16,7 +16,9 @@ mongoose
 
 //Read json file
 
-const patient = JSON.parse(fs.readFileSync(`${__dirname}/event.json`, "utf-8"));
+const patient = JSON.parse(
+  fs.readFileSync(`${__dirname}/updated_event.json`, "utf-8")
+);
 
 //import data into database;
 const importData = async () => {
