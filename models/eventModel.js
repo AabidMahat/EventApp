@@ -1,114 +1,65 @@
 const mongoose = require("mongoose");
 
-// Define schema based on JSON data
+// Define schema for event form data
 const eventSchema = new mongoose.Schema({
-  imageurl: {
+  title: {
     type: String,
+    required: true,
   },
   description: {
     type: String,
   },
+  date: {
+    type: String, // Consider using Date type for more precise date-time handling
+  },
+  startTime: {
+    type: String, // Consider using Date type for more precise time handling
+  },
+  endTime: {
+    type: String, // Consider using Date type for more precise time handling
+  },
   location: {
     type: String,
   },
-  title: {
+  apartment: {
     type: String,
   },
-  eventType: {
+  region: {
     type: String,
   },
-  ticketprice: {
+  venueName: {
+    type: String,
+  },
+  ticketPrice: {
     type: Number,
   },
-  dateandtime: {
+  isFree: {
+    type: Boolean,
+  },
+  capacity: {
+    type: Number,
+  },
+  instructions: {
     type: String,
   },
-  fullUrl: {
-    type: String,
+  thingsToCarry: {
+    type: [String],
   },
-  category: {
-    type: String,
+  foodNeeds: {
+    type: [String],
   },
-  hashtags: {
+  utilities: {
     type: [String],
   },
   createdAt: {
     type: Date,
     default: Date.now,
-    select: false, // Exclude from query results
+    select: false,
   },
   updatedAt: {
     type: Date,
     default: Date.now,
-    select: false, // Exclude from query results
-  },
-  titlelogourl: {
-    type: String,
-    default: "",
-  },
-  eventstartDate: {
-    type: String,
-    default: "",
-  },
-  eventendDate: {
-    type: String,
-    default: "",
-  },
-  hostedby: {
-    type: String,
-    default: "",
-  },
-  createdAt: {
-    type: Date,
-    default: Date.now(),
-  },
-  hostedbylogo: {
-    type: String,
-    default: "",
-  },
-  url: {
-    type: String,
-    default: "",
-  },
-  hostdetails: {
-    type: String,
-    default: "",
-  },
-  hostIMG: {
-    type: String,
-    default: "",
-  },
-  imageURL: {
-    type: String,
-    default: "",
-  },
-  hostedbydepartment: {
-    type: String,
-    default: "",
-  },
-  hostedbyName: {
-    type: String,
-    default: "",
-  },
-  hostebylocation: {
-    type: String,
-    default: "",
-  },
-  OrganizerContact: {
-    type: String,
-    default: "",
-  },
-  howToReach: {
-    type: String,
-    default: "",
-  },
-  phone_numbers: {
-    type: [String],
-    default: [],
-  },
-  short_description: {
-    type: String,
-    default: "",
+    select: false,
   },
 });
 

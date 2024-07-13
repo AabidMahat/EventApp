@@ -7,11 +7,39 @@ const jwt = require("jsonwebtoken");
 const Email = require("../utils/email");
 const catchAsync = require("../utils/catchAsync");
 const twilio = require("twilio");
+const { findById, findByIdAndUpdate } = require("../models/eventModel");
+const qr = require("qrcode");
+
+//  const { Client } = require("whatsapp-web.js");
+// const qrcode = require("qrcode-terminal");
+
+// const whatsAppClient = new Client();
 
 const signToken = (id) =>
   jwt.sign({ id }, process.env.JWT_SECERT, {
     expiresIn: process.env.JWT_EXPIRES_IN,
   });
+
+const createSendToken = (user, statusCode, res, isAdmin = false) => {
+  const token = signToken(user._id);
+  const cookieOptions = {
+    expires: new Date(
+      Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000
+    ),
+    httpOnly: true,
+  };
+  res.cookie("jwt", token, cookieOptions);
+
+  res.status(statusCode).json({
+    status: "success",
+    greeting: `Welcome ${user.firstName} ${
+      user.role === "admin" ? "admin 💀" : ""
+    }`,
+    token,
+    data: user,
+  });
+};
+
 const sendSMS = async (otp, phone) => {
   // Ensure the phone number starts with '+91' for India
   const formattedPhone = phone.startsWith("+91") ? phone : "+91" + phone;
@@ -48,15 +76,13 @@ exports.createAccount = async (req, res, next) => {
 
     if (account.phone) {
       await sendSMS(account.otp, account.phone);
+    } else if (account.email) {
+      await new Email(account, "").otpVerify();
     }
 
     await account.save({ validateBeforeSave: false });
-    res.status(200).json({
-      status: "Success",
-      message: "Account created successfully",
-      token,
-      data: account,
-    });
+
+    createSendToken(account, 200, res);
   } catch (err) {
     res.status(404).json({
       status: "error",
@@ -222,16 +248,18 @@ exports.loginAccount = async (req, res, next) => {
     await account.save({ validateBeforeSave: false });
   }
 
-  const token = signToken(account._id);
+  generateQrCode(account);
+  // const token = signToken(account._id);
 
-  res.status(200).json({
-    status: "success",
-    message: "Account LogIn Successfully",
-    greeting: `Welcome ${account.firstName} ${
-      account.role === "admin" ? "admin 💀" : ""
-    }`,
-    token,
-  });
+  // res.status(200).json({
+  //   status: "success",
+  //   message: "Account LogIn Successfully",
+  //   greeting: `Welcome ${account.firstName} ${
+  //     account.role === "admin" ? "admin 💀" : ""
+  //   }`,
+  //   token,
+  // });
+  createSendToken(account, 200, res, isAdmin);
 };
 exports.forgotPassword = catchAsync(async (req, res, next) => {
   const { email } = req.body;
@@ -400,3 +428,66 @@ exports.restrictTo = (...roles) => {
     next();
   };
 };
+
+exports.eventLiked = async (req, res, next) => {
+  const { eventId } = req.params;
+  const { isLiked } = req.body;
+
+  let update;
+  if (isLiked) {
+    update = { $addToSet: { eventLiked: eventId } };
+  } else {
+    update = { $pull: { eventLiked: eventId } };
+  }
+
+  const user = await Account.findByIdAndUpdate(req.account._id, update, {
+    new: true,
+    runValidators: true,
+  });
+
+  if (!user) {
+    return res.status(404).json({
+      status: "error",
+      message: "Error while performing the action",
+    });
+  }
+
+  res.status(200).json({
+    status: "success",
+    data: user,
+  });
+};
+
+const generateQrCode = (data) => {
+  console.log(data);
+  let stJson = JSON.stringify(data);
+  qr.toFile(`${data.firstName}.png`, stJson, {
+    type: "terminal",
+    function(err) {
+      if (err) return console.log(err);
+    },
+  });
+};
+
+// exports.sendWhatsapp = async () => {
+//   try {
+//     whatsAppClient.on("qr", (qr) => {
+//       qrcode.generate(qr, { small: true });
+//       console.log("QR RECEIVED", qr);
+//     });
+
+//     whatsAppClient.on("ready", async () => {
+//       console.log("WhatsApp is ready");
+//       const phoneNumber = "+917028868733"; // Replace with the recipient's phone number
+//       const message = "Hey Mummy";
+
+//       const chatId = phoneNumber.substring(1) + "@c.us"; // WhatsApp ID for the phone number
+//       await whatsAppClient.sendMessage(chatId, message);
+//       console.log("Message sent successfully");
+//     });
+
+//     whatsAppClient.initialize();
+//   } catch (err) {
+//     console.error(err);
+//   }
+// };

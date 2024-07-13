@@ -31,7 +31,7 @@ exports.updateAddressProfile = async (req, res, next) => {
     const profile = await Profile.findByIdAndUpdate(
       id,
       { [`addresses.${addressType}`]: addressData },
-      { new: true, runValidators: true } // Options to return the updated document and run schema validators
+      { new: true, runValidators: true }
     );
 
     if (!profile) {

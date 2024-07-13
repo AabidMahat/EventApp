@@ -27,4 +27,9 @@ router
   .route("/updateAccount/:accountId")
   .patch(accountController.updateAccount);
 
+router
+  .route("/likedEvent/:eventId")
+  .patch(accountController.protect, accountController.eventLiked);
+
+// router.route("/sendWhatsapp").get(accountController.sendWhatsapp);
 module.exports = router;

@@ -10,6 +10,7 @@
   "license": "ISC",
   "dependencies": {
     "@vitalets/google-translate-api": "^9.2.0",
+    "axios": "^1.7.2",
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
     "csv-parser": "^3.0.0",
@@ -25,8 +26,12 @@
     "node-cron": "^3.0.3",
     "nodemailer": "^6.9.14",
     "pug": "^3.0.3",
+    "qrcode": "^1.5.3",
+    "qrcode-terminal": "^0.12.0",
     "razorpay": "^2.9.4",
     "twilio": "^5.2.2",
-    "validator": "^13.12.0"
+    "validator": "^13.12.0",
+    "wbm": "^1.1.16",
+    "whatsapp-web.js": "^1.16.4-alpha.0"
   }
 }

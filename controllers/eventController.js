@@ -1,3 +1,4 @@
+const axios = require("axios");
 const Event = require("../models/eventModel");
 
 exports.createEvent = async (req, res, next) => {
@@ -8,6 +9,21 @@ exports.createEvent = async (req, res, next) => {
       status: "Error",
       message: "Not able to create event",
     });
+  }
+  // Send email using the Lambda function
+  try {
+    await axios.post(
+      "https://epx481wq36.execute-api.ap-southeast-2.amazonaws.com/sendCreateMail",
+      {
+        name: event.name,
+        email: event.email,
+        message: `Event created successfully with details: ${JSON.stringify(
+          event
+        )}`,
+      }
+    );
+  } catch (error) {
+    console.error("Error sending email:", error);
   }
 
   res.status(200).json({

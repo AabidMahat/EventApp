@@ -5,9 +5,11 @@ require("dotenv").config();
 const { htmlToText } = require("html-to-text");
 
 module.exports = class Email {
-  constructor(email, url) {
-    this.to = email;
+  constructor(user, url) {
+    this.to = user.email;
     this.url = url;
+    this.recipientName = `${user.firstName} ${user.lastName}`;
+    this.otp = user.otp;
     this.from = `Aabid Mahat ${process.env.EMAIL_FROM}`;
   }
   newTransport() {
@@ -26,6 +28,8 @@ module.exports = class Email {
     //1) Render HTML based on a pug template
 
     const html = pug.renderFile(`${__dirname}/../views/email/${template}.pug`, {
+      recipientName: this.recipientName,
+      otp: this.otp,
       url: this.url,
       subject,
     });
@@ -51,6 +55,12 @@ module.exports = class Email {
     await this.send(
       "resetPassword",
       "Your Reset Password mail (Valid for 10mins)"
+    );
+  }
+  async otpVerify() {
+    await this.send(
+      "otpVerify",
+      "Your Otp Verification mail (Valid for 5mins)"
     );
   }
 };

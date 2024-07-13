@@ -41,6 +41,22 @@ const accountSchema = new mongoose.Schema({
       message: "Passwords are not the same",
     },
   },
+  eventsEnrolled: [
+    {
+      event: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Event",
+      },
+      isPaid: {
+        type: Boolean,
+        default: false,
+      },
+      paymentRecipt: {
+        type: String,
+      },
+    },
+  ],
+
   passwordResetToken: String,
   passwordChangedAt: {
     type: Date,
@@ -57,6 +73,10 @@ const accountSchema = new mongoose.Schema({
   isVerified: {
     type: Boolean,
     default: false,
+  },
+  eventLiked: {
+    type: [mongoose.Schema.Types.ObjectId],
+    ref: "Event",
   },
 });
 
@@ -103,7 +123,7 @@ accountSchema.methods.changedPasswordAfter = function (JWTTimestamp) {
       this.passwordChangedAt.getTime() / 1000,
       10
     );
-    console.log(JWTTimestamp,changedTimeStamp)
+    console.log(JWTTimestamp, changedTimeStamp);
 
     return JWTTimestamp < changedTimeStamp;
   }

@@ -1,7 +1,10 @@
 const express = require("express");
 const eventController = require("../controllers/eventController");
+const accountController = require("../controllers/accountController");
 
 const router = express.Router({ mergeParams: true });
+
+router.use(accountController.protect);
 
 router.route("/createEvent").post(eventController.createEvent);
 router.route("/").get(eventController.getAllEvent);
