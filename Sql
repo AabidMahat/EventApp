@@ -1,1 +1,135 @@
-https://chatgpt.com/share/67bbea28-2a00-8001-9272-d32e99b8f8c2
+Here are the SQL Server queries for each task:
+
+Task 1: Find Employees and Their Department Names Using INNER JOIN
+sql
+Copy code
+SELECT e.Name AS EmployeeName, d.DepartmentName, e.HireDate
+FROM Employees e
+INNER JOIN Departments d ON e.DepartmentID = d.DepartmentID;
+Task 2: List Employees Without a Manager (SELF JOIN OR LEFT JOIN)
+sql
+Copy code
+SELECT e.EmployeeID, e.Name AS EmployeeName
+FROM Employees e
+LEFT JOIN Employees m ON e.ManagerID = m.EmployeeID
+WHERE e.ManagerID IS NULL;
+Task 3: Find Departments Without Any Employees (LEFT JOIN)
+sql
+Copy code
+SELECT d.DepartmentID, d.DepartmentName
+FROM Departments d
+LEFT JOIN Employees e ON d.DepartmentID = e.DepartmentID
+WHERE e.EmployeeID IS NULL;
+Task 4: Get the Total Salary (Base + Bonus) for Each Employee
+sql
+Copy code
+SELECT EmployeeID, Name, (BaseSalary + Bonus) AS TotalSalary
+FROM Employees;
+Task 5: Identify the Employee with the Highest Salary (Subquery)
+sql
+Copy code
+SELECT EmployeeID, Name, BaseSalary + Bonus AS TotalSalary
+FROM Employees
+WHERE (BaseSalary + Bonus) = (
+    SELECT MAX(BaseSalary + Bonus) FROM Employees
+);
+Task 6: Find Employees Earning More Than Their Manager (SELF JOIN)
+sql
+Copy code
+SELECT e.EmployeeID, e.Name AS EmployeeName, e.BaseSalary + e.Bonus AS EmployeeSalary, 
+       m.Name AS ManagerName, m.BaseSalary + m.Bonus AS ManagerSalary
+FROM Employees e
+JOIN Employees m ON e.ManagerID = m.EmployeeID
+WHERE (e.BaseSalary + e.Bonus) > (m.BaseSalary + m.Bonus);
+Task 7: Create a View for HR to See Employee Salary Details
+sql
+Copy code
+CREATE VIEW EmployeeSalaryView AS
+SELECT e.EmployeeID, e.Name, d.DepartmentName, e.BaseSalary, e.Bonus, 
+       (e.BaseSalary + e.Bonus) AS TotalSalary
+FROM Employees e
+JOIN Departments d ON e.DepartmentID = d.DepartmentID;
+Task 8: Get Employees Who Have Been Working for More Than 3 Years (DATEDIFF)
+sql
+Copy code
+SELECT EmployeeID, Name, HireDate
+FROM Employees
+WHERE DATEDIFF(YEAR, HireDate, GETDATE()) > 3;
+Task 9: Find the Number of Employees in Each Department (GROUP BY)
+sql
+Copy code
+SELECT d.DepartmentName, COUNT(e.EmployeeID) AS EmployeeCount
+FROM Departments d
+LEFT JOIN Employees e ON d.DepartmentID = e.DepartmentID
+GROUP BY d.DepartmentName;
+Let me know if you need modifications or explanations!
+
+
+
+
+
+
+You said:
+Provide me the table schema and values
+ChatGPT said:
+Here is the table schema for Employees and Departments, along with sample data to test your SQL queries in SQL Server.
+
+1. Create Tables
+Employees Table
+sql
+Copy code
+CREATE TABLE Employees (
+    EmployeeID INT PRIMARY KEY IDENTITY(1,1),
+    Name NVARCHAR(100) NOT NULL,
+    DepartmentID INT,
+    HireDate DATE,
+    BaseSalary DECIMAL(10,2),
+    Bonus DECIMAL(10,2),
+    ManagerID INT NULL,
+    FOREIGN KEY (DepartmentID) REFERENCES Departments(DepartmentID),
+    FOREIGN KEY (ManagerID) REFERENCES Employees(EmployeeID)
+);
+Departments Table
+sql
+Copy code
+CREATE TABLE Departments (
+    DepartmentID INT PRIMARY KEY IDENTITY(1,1),
+    DepartmentName NVARCHAR(100) NOT NULL
+);
+2. Insert Sample Data
+Insert Data into Departments
+sql
+Copy code
+INSERT INTO Departments (DepartmentName) VALUES 
+('HR'),
+('Finance'),
+('IT'),
+('Marketing'),
+('Operations');
+Insert Data into Employees
+sql
+Copy code
+INSERT INTO Employees (Name, DepartmentID, HireDate, BaseSalary, Bonus, ManagerID) VALUES
+('Alice Johnson', 1, '2018-06-10', 60000, 5000, NULL),  -- No manager (Top-level)
+('Bob Smith', 2, '2019-08-15', 55000, 4500, 1),  -- Reports to Alice
+('Charlie Brown', 2, '2020-02-20', 48000, 4000, 1), -- Reports to Alice
+('David Wilson', 3, '2017-03-25', 70000, 6000, NULL), -- No manager (Top-level)
+('Emily Davis', 3, '2021-07-05', 50000, 3500, 4), -- Reports to David
+('Frank Miller', 4, '2016-09-30', 80000, 7000, NULL), -- No manager (Top-level)
+('Grace Lee', 4, '2019-11-12', 65000, 5500, 6), -- Reports to Frank
+('Henry Martin', 5, '2015-12-01', 75000, 6500, NULL), -- No manager (Top-level)
+('Ivy Carter', 5, '2022-01-10', 45000, 3000, 8), -- Reports to Henry
+('Jack Turner', 2, '2023-05-22', 47000, 3200, 2); -- Reports to Bob
+3. Sample Output for the Queries
+Now, you can run the queries I provided earlier using this schema and data.
+
+Key Features of This Sample Data:
+
+Alice Johnson, David Wilson, Frank Miller, and Henry Martin have no managers (Task 2).
+Some departments (e.g., IT, Marketing, and Operations) have employees, while others may have none (Task 3).
+Frank Miller has the highest total salary (Task 5).
+Bob Smith and Charlie Brown report to Alice Johnson, but one of them might earn more than their manager (Task 6).
+The EmployeesalaryView will provide salary details for all employees (Task 7).
+Employees hired before July 2021 have worked for more than 3 years (Task 8).
+GROUP BY will show the number of employees per department (Task 9).
+Let me know if you need modifications or additional constraints!
